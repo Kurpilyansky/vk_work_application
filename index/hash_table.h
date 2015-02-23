@@ -21,11 +21,19 @@ void init_HashTable(struct HashTable* hashTablePtr, size_t hashSize) {
     assert(hashSize > 0);
     hashTablePtr->hashSize = hashSize;
     hashTablePtr->size = 0;
+
     hashTablePtr->first = malloc(hashSize * sizeof(size_t));
-    hashTablePtr->next = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(size_t));
-    hashTablePtr->values = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(char*));
-    hashTablePtr->hashes = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(HashType));
+    assert(hashTablePtr->first != NULL);
     memset(hashTablePtr->first, 0xff, hashSize * sizeof(size_t));
+
+    hashTablePtr->next = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(size_t));
+    assert(hashTablePtr->next != NULL);
+
+    hashTablePtr->values = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(char*));
+    assert(hashTablePtr->values != NULL);
+
+    hashTablePtr->hashes = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(HashType));
+    assert(hashTablePtr->hashes != NULL);
 }
 
 void destruct_HashTable(struct HashTable* hashTablePtr) {
