@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 const int HASH_TABLE_FACTOR = 10;
+const int EXPAND_FACTOR = 2;
 
 typedef unsigned long long HashType;
 
@@ -80,7 +81,7 @@ bool tryAddIntoHashTable_Internal(struct HashTable* hashTablePtr, const char* s,
 
 void rehashHashTable(struct HashTable* hashTablePtr) {
     struct HashTable newHashTable;
-    init_HashTable(&newHashTable, (size_t)(hashTablePtr->hashSize * 2));
+    init_HashTable(&newHashTable, hashTablePtr->hashSize * EXPAND_FACTOR);
     size_t i;
     for (i = 0; i < hashTablePtr->size; ++i) {
         tryAddIntoHashTable_Internal(&newHashTable, hashTablePtr->values[i], hashTablePtr->hashes[i], true);
