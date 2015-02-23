@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     if (maxL < 2 * minL + 1) {
         maxL = 2 * minL + 1;
     }
-    assert(totalL > minL);
+    assert(totalL >= minL);
 
     if (seed == -1) {
         seed = time(0);
@@ -48,12 +48,12 @@ int main(int argc, char **argv) {
     size_t sumL = 0;
     while (sumL < totalL) {
         int curL;
-        if (totalL - sumL < 2 * minL + 2) {
-            curL = totalL - sumL - 1;
+        if (totalL - sumL < 2 * minL + 1) {
+            curL = totalL - sumL;
         } else { // totalL - sumL >= 2 * minL + 2
             curL = (rand31() % (maxL - minL + 1)) + minL;
-            if (sumL + curL + minL + 1 > totalL) {
-                curL = totalL - sumL - (minL + 1) - 1;
+            if (sumL + curL + minL > totalL) {
+                curL = totalL - sumL - minL - 1;
             }
         }
         assert(minL <= curL && curL <= maxL);
@@ -72,7 +72,10 @@ int main(int argc, char **argv) {
     size_t i, pos;
     for (i = 0, pos = 0; i < count; ++i) {
         size_t len = strlen(text + pos);
-        fprintf(textFile, "%s\n", text + pos);
+        if (i != 0) {
+            fprintf(textFile, "\n");
+        }
+        fprintf(textFile, "%s", text + pos);
         starts[i] = pos;
         pos += len + 1;
     }

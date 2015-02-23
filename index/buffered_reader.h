@@ -29,7 +29,7 @@ bool readLine(struct BufferedReader* reader, char * s, int maxL) {
             return true;
         } else {
             s[length++] = reader->buffer[reader->buffer_offset++];
-            assert(length < maxL);
+            assert(length <= maxL);
         }
     }
     s[length] = '\0';
