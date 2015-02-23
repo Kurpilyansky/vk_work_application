@@ -19,6 +19,10 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
 int main(int argc, char **argv) {
     if (argc < 5) {
         fprintf(stderr, "Usage: %s <seed> <minL> <maxL> <totalL>\n", argv[0]);
@@ -80,6 +84,31 @@ int main(int argc, char **argv) {
         pos += len + 1;
     }
     fclose(textFile);
+
+    FILE* queryFile = fopen("queries_file.txt", "w");
+    FILE* answerFile = fopen("answers_file.txt", "w");
+    sumL = 0;
+    while (sumL < totalL) {
+        if (rand() % 2 == 0) {
+            int i = rand31() % count;
+            fprintf(queryFile, "%s\n", text + starts[i]);
+            fprintf(answerFile, "YES\n");
+            sumL += strlen(text + starts[i]) + 1;
+        } else {
+            int curL = max(15, min(totalL - sumL, rand31() % (maxL - minL + 1) + minL));
+            sumL += curL + 1;
+            while (curL > 0) {
+                fprintf(queryFile, "%c", randChar());
+                --curL;
+            }
+            fprintf(queryFile, "\n");
+            fprintf(answerFile, "NO\n");
+        }
+    }
+    fprintf(queryFile, "exit\n");
+
+    fclose(queryFile);
+    fclose(answerFile);
 
     free(starts);
 
