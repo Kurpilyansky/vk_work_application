@@ -2,9 +2,15 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "buffered_reader.h"
 #include "hash_table.h"
+
+void stamp(const char * message) {
+    fprintf(stderr, "%s: %.2lf\n", message, ((double)clock()) / CLOCKS_PER_SEC);
+    fflush(stderr);
+}
 
 #define MAX_SIZE (128 * 1024 * 1024)
 char text[MAX_SIZE + 1];
@@ -38,6 +44,7 @@ int main(int argc, char** argv) {
     init_HashTable(&hashTable, 10);
 
     indexLinesInFile(argv[1], &hashTable);
+    stamp("HashTable has been built");
 
     struct BufferedReader reader;
     init_BufferedReader(&reader, stdin);
@@ -50,6 +57,10 @@ int main(int argc, char** argv) {
         printf("%s\n", containsIntoHashTable(&hashTable, input) ? "YES" : "NO");
     }
 
+    stamp("Stdin has been processed");
+
     destruct_HashTable(&hashTable);
+
+    stamp("HashTable has been destroyed");
 	return 0;
 }
