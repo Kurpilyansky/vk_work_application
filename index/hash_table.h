@@ -3,8 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
-const int HASH_TABLE_FACTOR = 5;
-const double EXTEND_FACTOR = 2;
+const int HASH_TABLE_FACTOR = 10;
 
 typedef unsigned long long HashType;
 
@@ -19,6 +18,9 @@ struct HashTable {
 
 void init_HashTable(struct HashTable* hashTablePtr, size_t hashSize) {
     assert(hashSize > 0);
+    while (hashSize & (hashSize - 1)) {
+        hashSize += hashSize - (hashSize & (hashSize - 1));
+    }
     hashTablePtr->hashSize = hashSize;
     hashTablePtr->size = 0;
 
@@ -34,6 +36,10 @@ void init_HashTable(struct HashTable* hashTablePtr, size_t hashSize) {
 
     hashTablePtr->hashes = malloc(hashSize * HASH_TABLE_FACTOR * sizeof(HashType));
     assert(hashTablePtr->hashes != NULL);
+}
+
+void init_HashTableByCapacity(struct HashTable* hashTablePtr, size_t capacity) {
+    init_HashTable(hashTablePtr, capacity * 4 / HASH_TABLE_FACTOR + 1);
 }
 
 void destruct_HashTable(struct HashTable* hashTablePtr) {
@@ -70,27 +76,27 @@ HashType calculateHash(const char * s) {
 void rehashHashTable(struct HashTable* hashTablePtr);
 bool tryAddIntoHashTable(struct HashTable* hashTablePtr, const char* s);
 bool containsIntoHashTable(struct HashTable* hashTablePtr, const char* s);
-bool tryAddIntoHashTable_Internal(struct HashTable* hashTablePtr, const char* s, HashType hash);
+bool tryAddIntoHashTable_Internal(struct HashTable* hashTablePtr, const char* s, HashType hash, bool sureNew);
 
 void rehashHashTable(struct HashTable* hashTablePtr) {
     struct HashTable newHashTable;
-    init_HashTable(&newHashTable, (size_t)(hashTablePtr->hashSize * EXTEND_FACTOR));
+    init_HashTable(&newHashTable, (size_t)(hashTablePtr->hashSize * 2));
     size_t i;
     for (i = 0; i < hashTablePtr->size; ++i) {
-        tryAddIntoHashTable_Internal(&newHashTable, hashTablePtr->values[i], hashTablePtr->hashes[i]);
+        tryAddIntoHashTable_Internal(&newHashTable, hashTablePtr->values[i], hashTablePtr->hashes[i], true);
     }
     destruct_HashTable(hashTablePtr);
     memcpy((char*)hashTablePtr, (char*)&newHashTable, sizeof(struct HashTable));
 }
 
 bool tryAddIntoHashTable(struct HashTable* hashTablePtr, const char* s) {
-    tryAddIntoHashTable_Internal(hashTablePtr, s, calculateHash(s));
+    tryAddIntoHashTable_Internal(hashTablePtr, s, calculateHash(s), false);
 }
 
-bool tryAddIntoHashTable_Internal(struct HashTable* hashTablePtr, const char* s, HashType hash) {
+bool tryAddIntoHashTable_Internal(struct HashTable* hashTablePtr, const char* s, HashType hash, bool sureNew) {
     while (true) {
         size_t position = hash % hashTablePtr->hashSize;
-        size_t current = hashTablePtr->first[position];
+        size_t current = sureNew ? -1 : hashTablePtr->first[position];
         size_t count = 0;
         while (current != -1 && (hashTablePtr->hashes[current] != hash || strcmp(hashTablePtr->values[current], s) != 0)) {
             current = hashTablePtr->next[current];

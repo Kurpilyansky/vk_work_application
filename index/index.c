@@ -22,14 +22,31 @@ void indexLinesInFile(const char * filename, struct HashTable* hashTablePtr) {
     struct BufferedReader reader;
     init_BufferedReader(&reader, file);
 
+    size_t count = 0;
     size_t offset = 0;
     char* s;
     while (readLine(&reader, s = text + offset, sizeof(text) - 1 - offset)) {
         size_t length = strlen(s);
-        if (tryAddIntoHashTable(hashTablePtr, s)) {
-            offset += length + 1;
-        }
+        offset += length + 1;
+        ++count;
     }
+
+    fprintf(stderr, "Total count %d\n", (int)count);
+
+    init_HashTableByCapacity(hashTablePtr, count);
+
+    size_t i;
+    size_t different_count = 0;
+    for (i = 0, offset = 0; i < count; ++i) {
+        s = text + offset;
+        size_t length = strlen(s);
+        if (tryAddIntoHashTable(hashTablePtr, s)) {
+            ++different_count;
+        }
+        offset += length + 1;
+    }
+
+    fprintf(stderr, "Different count: %d\n", (int)different_count);
 
     fclose(file);
 }
@@ -41,7 +58,6 @@ int main(int argc, char** argv) {
     }
 
     struct HashTable hashTable;
-    init_HashTable(&hashTable, 10);
 
     indexLinesInFile(argv[1], &hashTable);
     stamp("HashTable has been built");
