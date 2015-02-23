@@ -56,7 +56,6 @@ bool containsIntoHashTable(struct HashTable* hashTablePtr, const char* s);
 void rehashHashTable(struct HashTable* hashTablePtr) {
     struct HashTable newHashTable;
     init_HashTable(&newHashTable, hashTablePtr->hashSize * 2);
-    fprintf(stderr, "rehashing. newHashSize = %lld\n", (long long)newHashTable.hashSize);
     size_t i;
     for (i = 0; i < hashTablePtr->size; ++i) {
         tryAddIntoHashTable(&newHashTable, hashTablePtr->values[i]);
