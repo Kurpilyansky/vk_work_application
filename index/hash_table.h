@@ -122,7 +122,7 @@ bool containsIntoHashTable(struct HashTable* hashTablePtr, const char * s) {
     long long hash = calculateHash(s);
     size_t position = hash % hashTablePtr->hashSize;
     size_t current = hashTablePtr->first[position];
-    while (current != -1 && strcmp(hashTablePtr->values[current], s) != 0) {
+    while (current != -1 && (hashTablePtr->hashes[current] != hash || strcmp(hashTablePtr->values[current], s) != 0)) {
         current = hashTablePtr->next[current];
     }
     return current != -1;
