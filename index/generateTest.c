@@ -56,10 +56,11 @@ int main(int argc, char **argv) {
             curL = totalL - sumL;
         } else { // totalL - sumL >= 2 * minL + 2
             curL = (rand31() % (maxL - minL + 1)) + minL;
-            if (sumL + curL + minL > totalL) {
+            if (sumL + curL + 1 + minL > totalL) {
                 curL = totalL - sumL - minL - 1;
             }
         }
+//        fprintf(stderr, "sumL = %d, curL = %d\n", (int)sumL, (int)curL);
         assert(minL <= curL && curL <= maxL);
 
         while (curL > 0) {
