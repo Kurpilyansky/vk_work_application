@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
-const int HASH_TABLE_FACTOR = 10;
+const int HASH_TABLE_FACTOR = 14;
 const int EXPAND_FACTOR = 2;
 
 typedef unsigned long long HashType;
@@ -63,7 +63,7 @@ void rehashHashTable(struct HashTable* hashTablePtr) {
     size_t i, j;
     const HashType* row;
     for (i = 0, row = hashTablePtr->hashes; i < hashTablePtr->hashSize; ++i, row += HASH_TABLE_FACTOR) {
-        for (j = 0; j < HASH_TABLE_FACTOR && row[j] != UNDEF_HASH; ++j) {
+        for (j = 0; row[j] != UNDEF_HASH; ++j) {
             tryAddIntoHashTable_Internal(&newHashTable, row[j], true);
         }
     }
@@ -81,10 +81,10 @@ bool tryAddIntoHashTable_Internal(struct HashTable* hashTablePtr, HashType hash,
         size_t position = hash % hashTablePtr->hashSize;
         HashType* row = hashTablePtr->hashes + position * HASH_TABLE_FACTOR;
         size_t next = 0;
-        while (next < HASH_TABLE_FACTOR && row[next] != hash && row[next] != UNDEF_HASH) {
+        while (row[next] != hash && row[next] != UNDEF_HASH) {
             ++next;
         }
-        if (next < HASH_TABLE_FACTOR && row[next] == hash) {
+        if (row[next] == hash) {
             return false;
         }
         if (next + 1 < HASH_TABLE_FACTOR) {
@@ -101,9 +101,9 @@ bool containsIntoHashTable(struct HashTable* hashTablePtr, const char * s) {
     size_t position = hash % hashTablePtr->hashSize;
     HashType* row = hashTablePtr->hashes + position * HASH_TABLE_FACTOR;
     size_t next = 0;
-    while (next < HASH_TABLE_FACTOR && row[next] != hash && row[next] != UNDEF_HASH) {
+    while (row[next] != hash && row[next] != UNDEF_HASH) {
         ++next;
     }
-    return next < HASH_TABLE_FACTOR && row[next] == hash;
+    return row[next] == hash;
 }
 
