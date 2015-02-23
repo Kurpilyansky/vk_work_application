@@ -3,7 +3,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
-const int HASH_TABLE_FACTOR = 100;
+const int HASH_TABLE_FACTOR = 5;
+const double EXTEND_FACTOR = 2;
 
 struct HashTable {
     size_t hashSize;
@@ -38,13 +39,14 @@ void destruct_HashTable(struct HashTable* hashTablePtr) {
     }
 }
 
-long long calculateHash(const char * s) {
-    static const long long MOD = (long long)(1e9) + 7;
+unsigned long long calculateHash(const char * s) {
+//    static const long long MOD = (long long)(1e9) + 7;
     static const long long P = 997;
     long long hash = 0;
     size_t i;
     for (i = 0; s[i] != '\0'; ++i) {
-        hash = (hash * P + s[i]) % MOD;
+        hash = hash * P + s[i];
+//        hash %= MOD;
     }
     return hash;
 }
@@ -55,7 +57,7 @@ bool containsIntoHashTable(struct HashTable* hashTablePtr, const char* s);
 
 void rehashHashTable(struct HashTable* hashTablePtr) {
     struct HashTable newHashTable;
-    init_HashTable(&newHashTable, hashTablePtr->hashSize * 2);
+    init_HashTable(&newHashTable, (size_t)(hashTablePtr->hashSize * EXTEND_FACTOR));
     size_t i;
     for (i = 0; i < hashTablePtr->size; ++i) {
         tryAddIntoHashTable(&newHashTable, hashTablePtr->values[i]);
@@ -65,7 +67,7 @@ void rehashHashTable(struct HashTable* hashTablePtr) {
 }
 
 bool tryAddIntoHashTable(struct HashTable* hashTablePtr, const char* s) {
-    long long hash = calculateHash(s);
+    unsigned long long hash = calculateHash(s);
     while (true) {
         size_t position = hash % hashTablePtr->hashSize;
         size_t current = hashTablePtr->first[position];
