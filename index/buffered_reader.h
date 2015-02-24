@@ -3,7 +3,7 @@
 
 struct BufferedReader {
     FILE* file;
-    char buffer[64 * 1024];
+    char buffer[512 * 1024];
     size_t buffer_size, buffer_offset;
 };
 
@@ -16,11 +16,11 @@ bool readLine(struct BufferedReader* reader, char * s, int maxL) {
     size_t length = 0;
     while (true) {
         if (reader->buffer_size == reader->buffer_offset) {
-            if (fgets(reader->buffer, sizeof(reader->buffer), reader->file) == NULL) {
+            if (feof(reader->file)) {
                 break;
             }
             reader->buffer_offset = 0;
-            reader->buffer_size = strlen(reader->buffer);
+            reader->buffer_size = fread(reader->buffer, 1, sizeof(reader->buffer), reader->file);
             continue;
         }
         if (reader->buffer[reader->buffer_offset] == '\n') {
