@@ -18,6 +18,8 @@ genTest1: compileGenTest
 genTest2: compileGenTest
 	./generateTest -1 10 20 134217728
 genTest3: compileGenTest
+	./generateTest -1 1 1 134217728
+genTest4: compileGenTest
 	./generateTest -1 134217728 134217728 134217728
 
 runCustom: compile

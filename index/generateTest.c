@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
     if (minL <= 0) {
         minL = 1;
     }
-    if (maxL < 2 * minL + 1) {
-        maxL = 2 * minL + 1;
+    if (maxL < 2 * minL) {
+        maxL = 2 * minL;
     }
     assert(totalL >= minL);
 
